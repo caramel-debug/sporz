@@ -1,0 +1,3 @@
+{
+  "rewrites": [{ "source": "/((?!_next/).*)", "destination": "/index.html" }]
+}

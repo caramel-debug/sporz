@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest'
+import { it, expect } from 'vitest'
 import { resolveNight, isHackerRoleAllowed, getPublicRole } from '../night'
 import type { GameState, Player, NightActions } from '../types'
 

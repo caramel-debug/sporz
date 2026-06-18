@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest'
+import { it, expect } from 'vitest'
 import { checkEnd } from '../endCondition'
 import { resolveExecution } from '../day'
 import type { GameState, Player } from '../types'

@@ -13,7 +13,7 @@ export default function DayScreen() {
   const execute = () => {
     if (!selectedVote) return
     const targetId = selectedVote === 'blanc' ? null : selectedVote
-    const { state: nextState, reports } = resolveExecution(state, targetId)
+    const { state: nextState } = resolveExecution(state, targetId)
     const endResult = checkEnd(nextState)
     const finalState = endResult === 'sains' || endResult === 'mutants'
       ? { ...nextState, phase: 'ended' as const, winner: endResult }

@@ -6,7 +6,7 @@ import DayScreen from './DayScreen'
 import EndScreen from './EndScreen'
 
 export default function CockpitRouter() {
-  const { state, reset } = useGame()
+  const { state } = useGame()
 
   if (!state || state.phase === 'setup') return <SetupScreen />
   if (state.phase === 'distribution')   return <DistributionScreen />
