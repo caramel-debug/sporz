@@ -258,14 +258,14 @@ function StepContent({ step, actions, setActions, players, state }: {
                 <button onClick={() => set('mutantsTarget', null)} className="text-xs text-hud-muted hover:text-hud-red">× Effacer</button>
               )}
             </div>
-            <PlayerList players={players.filter(p => p.etat === 'sain')}
+            <PlayerList players={state.players.filter(p => p.alive && p.etat === 'sain')}
               onSelect={(id: string) => set('mutantsTarget', actions.mutantsTarget === id ? null : id)}
               selectedIds={actions.mutantsTarget ? [actions.mutantsTarget] : []} />
           </div>
         )}
         <div>
           <p className="text-xs text-hud-muted mb-1">Paralyser (optionnel) :</p>
-          <PlayerList players={players}
+          <PlayerList players={state.players.filter(p => p.alive)}
             onSelect={(id: string) => set('paralyzeTarget', actions.paralyzeTarget === id ? null : id)}
             selectedIds={actions.paralyzeTarget ? [actions.paralyzeTarget] : []} />
         </div>
