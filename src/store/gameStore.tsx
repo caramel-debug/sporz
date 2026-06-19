@@ -39,7 +39,12 @@ interface GameContextValue {
 const GameContext = createContext<GameContextValue | null>(null)
 
 export function GameProvider({ children }: { children: React.ReactNode }) {
-  const [state, dispatch] = useReducer(reducer, null, () => loadState())
+  const [state, dispatch] = useReducer(reducer, null, () => {
+    const initial = loadState()
+    // Initialise l'entrée courante de l'historique avec l'état chargé
+    window.history.replaceState({ gameState: initial }, '')
+    return initial
+  })
 
   useEffect(() => {
     if (state) saveState(state)
@@ -48,8 +53,26 @@ export function GameProvider({ children }: { children: React.ReactNode }) {
     }
   }, [state])
 
-  const setState = (s: GameState) => dispatch({ type: 'SET_STATE', state: s })
-  const reset = () => dispatch({ type: 'RESET' })
+  // Bouton retour du navigateur → restaure l'état précédent
+  useEffect(() => {
+    const handlePopState = (e: PopStateEvent) => {
+      const prev: GameState | null = e.state?.gameState ?? null
+      if (prev) dispatch({ type: 'SET_STATE', state: prev })
+      else dispatch({ type: 'RESET' })
+    }
+    window.addEventListener('popstate', handlePopState)
+    return () => window.removeEventListener('popstate', handlePopState)
+  }, [])
+
+  const setState = (s: GameState) => {
+    window.history.pushState({ gameState: s }, '')
+    dispatch({ type: 'SET_STATE', state: s })
+  }
+
+  const reset = () => {
+    window.history.pushState({ gameState: null }, '')
+    dispatch({ type: 'RESET' })
+  }
 
   return (
     <GameContext.Provider value={{ state, setState, reset }}>
