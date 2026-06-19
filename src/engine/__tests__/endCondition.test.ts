@@ -13,7 +13,7 @@ function makeState(players: Player[]): GameState {
     indicators[p.id] = { aOuvertLesYeux:false, mute:false, paralyse:false, soigne:false, infecte:false, inspectePsy:false, inspecteGeneticien:false }
   })
   return {
-    players, enabledRoles: [], phase: 'day', nightNumber: 1,
+    gid: 'TEST', players, enabledRoles: [], phase: 'day', nightNumber: 1,
     hackerHistory: [], log: [], winner: null, nightIndicators: indicators,
   }
 }

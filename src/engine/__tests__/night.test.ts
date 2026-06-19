@@ -12,6 +12,7 @@ function makeState(overrides: Partial<GameState> & { players: Player[] }): GameS
     }
   })
   return {
+    gid: 'TEST',
     enabledRoles: [],
     phase: 'night',
     nightNumber: 1,
