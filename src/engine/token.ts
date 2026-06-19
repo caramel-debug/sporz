@@ -3,6 +3,7 @@ export interface PlayerToken {
   r: string   // role
   e: string   // etat
   h?: true    // hote (mutant_base seulement)
+  g?: string  // gid (identifiant de partie)
 }
 
 export function encodeToken(token: PlayerToken): string {

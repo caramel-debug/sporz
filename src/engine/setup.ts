@@ -4,6 +4,10 @@ function makeId(): string {
   return Math.random().toString(36).slice(2, 10)
 }
 
+function makeGid(): string {
+  return Math.random().toString(36).slice(2, 6).toUpperCase()
+}
+
 function shuffle<T>(arr: T[]): T[] {
   const a = [...arr]
   for (let i = a.length - 1; i > 0; i--) {
@@ -84,6 +88,7 @@ export function assignRoles(names: string[], enabledRoles: Role[], mutantCount =
   })
 
   return {
+    gid: makeGid(),
     players,
     enabledRoles,
     phase: 'distribution',

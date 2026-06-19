@@ -60,6 +60,7 @@ export interface GameEvent {
 }
 
 export interface GameState {
+  gid: string
   players: Player[]
   enabledRoles: Role[]
   phase: 'setup' | 'distribution' | 'night' | 'day' | 'ended'

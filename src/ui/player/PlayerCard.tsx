@@ -43,6 +43,16 @@ export default function PlayerCard({ token }: PlayerCardProps) {
           <p className="text-sm text-hud-muted leading-relaxed">{info.action}</p>
         </HudPanel>
 
+        {token.g ? (
+          <div className="text-center text-xs text-hud-muted border border-hud-border rounded-sm py-1">
+            Partie <span className="font-mono text-hud-green">#{token.g}</span>
+          </div>
+        ) : (
+          <div className="text-center text-xs text-hud-amber border border-hud-amber rounded-sm py-1 px-2">
+            ⚠ Lien ancien — vérifiez votre rôle auprès de l'OdB
+          </div>
+        )}
+
         <div className="text-center text-xs text-hud-muted opacity-50">
           Ne partagez pas cet écran.
         </div>
