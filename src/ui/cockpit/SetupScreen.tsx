@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import type { Role } from '../../engine'
-import { assignRoles } from '../../engine'
+import { assignRoles, defaultMutantCount } from '../../engine'
 import { useGame } from '../../store/gameStore'
 import HudPanel from '../shared/HudPanel'
 
@@ -14,12 +14,16 @@ const OPTIONAL_ROLES: { role: Role; label: string }[] = [
 
 export default function SetupScreen() {
   const { setState } = useGame()
-  const [names, setNames] = useState<string[]>(['', '', '', '', '', '', '', ''])
+  const [names, setNames] = useState<string[]>([])
   const [enabledRoles, setEnabledRoles] = useState<Role[]>([])
   const [newName, setNewName] = useState('')
 
   const validNames = names.filter(n => n.trim())
-  const minPlayers = 3 + enabledRoles.length  // 1 mutant + 2 medecins + optionnels + 1 astro min
+  // null = auto (calculé depuis le nb de joueurs), nombre = override manuel
+  const [mutantOverride, setMutantOverride] = useState<number | null>(null)
+  const autoMutants = defaultMutantCount(validNames.length)
+  const mutantCount = mutantOverride ?? autoMutants
+  const minPlayers = mutantCount + 2 + enabledRoles.length + 1  // mutants + 2 médecins + optionnels + 1 astro min
   const isValid = validNames.length >= minPlayers
 
   const addName = () => {
@@ -38,7 +42,7 @@ export default function SetupScreen() {
 
   const start = () => {
     if (!isValid) return
-    const state = assignRoles(validNames, enabledRoles)
+    const state = assignRoles(validNames, enabledRoles, mutantCount)
     setState(state)
   }
 
@@ -83,7 +87,26 @@ export default function SetupScreen() {
       </HudPanel>
 
       <HudPanel title="Rôles spéciaux">
-        <div className="text-xs text-hud-muted mb-2">Mutant de base + 2 Médecins : toujours actifs</div>
+        <div className="flex items-center justify-between mb-3">
+          <span className="text-xs text-hud-muted">Mutants de base</span>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => setMutantOverride(v => Math.max(1, (v ?? autoMutants) - 1))}
+              className="w-6 h-6 border border-hud-border text-hud-muted hover:border-hud-red hover:text-hud-red rounded-sm text-sm leading-none"
+            >−</button>
+            <span className="text-hud-green font-bold w-4 text-center">{mutantCount}</span>
+            <button
+              onClick={() => setMutantOverride(v => Math.min(validNames.length - 1, (v ?? autoMutants) + 1))}
+              className="w-6 h-6 border border-hud-border text-hud-muted hover:border-hud-green hover:text-hud-green rounded-sm text-sm leading-none"
+            >+</button>
+            {mutantOverride !== null ? (
+              <button onClick={() => setMutantOverride(null)} className="text-xs text-hud-amber hover:text-hud-green ml-1">auto</button>
+            ) : (
+              <span className="text-xs text-hud-muted ml-1">(auto)</span>
+            )}
+          </div>
+        </div>
+        <div className="text-xs text-hud-muted mb-2">2 Médecins : toujours actifs</div>
         <div className="space-y-1">
           {OPTIONAL_ROLES.map(({ role, label }) => (
             <label key={role} className="flex items-center gap-2 cursor-pointer text-sm">
@@ -100,7 +123,7 @@ export default function SetupScreen() {
           ))}
         </div>
         <div className="text-xs text-hud-muted mt-3">
-          {3 + enabledRoles.length} rôles + {Math.max(0, validNames.length - 3 - enabledRoles.length)} astronaute(s)
+          {mutantCount + 2 + enabledRoles.length} rôles + {Math.max(0, validNames.length - mutantCount - 2 - enabledRoles.length)} astronaute(s)
         </div>
       </HudPanel>
 

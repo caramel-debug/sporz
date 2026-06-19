@@ -14,7 +14,6 @@ function makeState(players: Player[]): GameState {
   })
   return {
     players, enabledRoles: [], phase: 'day', nightNumber: 1,
-    pendingNight: { mutantsMode:null, mutantsTarget:null, paralyzeTarget:null, medecinHeals:[], medecinKill:null, psyTarget:null, geneticienTarget:null, espionTarget:null, hackerRole:null },
     hackerHistory: [], log: [], winner: null, nightIndicators: indicators,
   }
 }

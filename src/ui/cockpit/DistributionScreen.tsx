@@ -5,11 +5,22 @@ import HudPanel from '../shared/HudPanel'
 import PlayerCard from '../player/PlayerCard'
 import type { Player } from '../../engine'
 
+function copyToClipboard(text: string, setCopiedId: (id: string | null) => void, playerId: string) {
+  navigator.clipboard.writeText(text).then(() => {
+    setCopiedId(playerId)
+    setTimeout(() => setCopiedId(null), 2000)
+  }).catch(() => {
+    // Fallback: prompt
+    window.prompt('Copiez ce lien :', text)
+  })
+}
+
 export default function DistributionScreen() {
   const { state, setState } = useGame()
   const [passMode, setPassMode] = useState<'pass' | 'link'>('pass')
   const [revealedId, setRevealedId] = useState<string | null>(null)
   const [doneIds, setDoneIds] = useState<Set<string>>(new Set())
+  const [copiedId, setCopiedId] = useState<string | null>(null)
 
   if (!state) return null
 
@@ -33,14 +44,16 @@ export default function DistributionScreen() {
       ...(revealed.role === 'mutant_base' ? { h: true as true } : {}),
     }
     return (
-      <div className="min-h-screen flex flex-col">
+      <div>
         <PlayerCard token={token} />
-        <button
-          onClick={hidePlayer}
-          className="m-4 py-3 border border-hud-amber text-hud-amber font-bold tracking-widest uppercase hover:bg-hud-amber hover:text-hud-bg transition-colors rounded-sm"
-        >
-          ✓ Masquer — passer au suivant
-        </button>
+        <div className="fixed bottom-0 left-0 right-0 p-4 bg-hud-bg border-t border-hud-border">
+          <button
+            onClick={hidePlayer}
+            className="w-full py-3 border border-hud-amber text-hud-amber font-bold tracking-widest uppercase hover:bg-hud-amber hover:text-hud-bg transition-colors rounded-sm"
+          >
+            ✓ Masquer — passer au suivant
+          </button>
+        </div>
       </div>
     )
   }
@@ -84,10 +97,11 @@ export default function DistributionScreen() {
                   </button>
                 ) : (
                   <button
-                    onClick={() => navigator.clipboard.writeText(`${window.location.origin}/#${token}`)}
-                    className="px-3 py-1 text-xs border border-hud-blue text-hud-blue hover:bg-hud-blue hover:text-hud-bg transition-colors rounded-sm"
+                    onClick={() => copyToClipboard(`${window.location.origin}/#${token}`, setCopiedId, p.id)}
+                    className={`px-3 py-1 text-xs border transition-colors rounded-sm
+                      ${copiedId === p.id ? 'border-hud-green text-hud-green' : 'border-hud-blue text-hud-blue hover:bg-hud-blue hover:text-hud-bg'}`}
                   >
-                    Copier le lien
+                    {copiedId === p.id ? '✓ Copié' : 'Copier le lien'}
                   </button>
                 )}
               </li>

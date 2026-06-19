@@ -64,7 +64,6 @@ export interface GameState {
   enabledRoles: Role[]
   phase: 'setup' | 'distribution' | 'night' | 'day' | 'ended'
   nightNumber: number
-  pendingNight: NightActions
   hackerHistory: Role[]
   log: GameEvent[]
   winner: 'sains' | 'mutants' | null

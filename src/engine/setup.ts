@@ -13,16 +13,22 @@ function shuffle<T>(arr: T[]): T[] {
   return a
 }
 
-export function assignRoles(names: string[], enabledRoles: Role[]): GameState {
+export function defaultMutantCount(playerCount: number): number {
+  if (playerCount >= 13) return 3
+  if (playerCount >= 9)  return 2
+  return 1
+}
+
+export function assignRoles(names: string[], enabledRoles: Role[], mutantCount = 1): GameState {
   const allNames = shuffle([...names])
 
-  // Ordre d'attribution : mutant_base, medecin x2, optionnels, astronautes
+  // Ordre d'attribution : mutant_base x N, medecin x2, optionnels, astronautes
   const orderedRoles: Role[] = [
-    'mutant_base',
+    ...Array(mutantCount).fill('mutant_base' as Role),
     'medecin',
     'medecin',
     ...enabledRoles,
-    ...Array(Math.max(0, allNames.length - 2 - enabledRoles.length - 1)).fill('astronaute' as Role),
+    ...Array(Math.max(0, allNames.length - mutantCount - 2 - enabledRoles.length)).fill('astronaute' as Role),
   ]
 
   // Indices des joueurs qui ne sont ni mutant_base ni medecin
@@ -82,17 +88,6 @@ export function assignRoles(names: string[], enabledRoles: Role[]): GameState {
     enabledRoles,
     phase: 'distribution',
     nightNumber: 0,
-    pendingNight: {
-      mutantsMode: null,
-      mutantsTarget: null,
-      paralyzeTarget: null,
-      medecinHeals: [],
-      medecinKill: null,
-      psyTarget: null,
-      geneticienTarget: null,
-      espionTarget: null,
-      hackerRole: null,
-    },
     hackerHistory: [],
     log: [],
     winner: null,

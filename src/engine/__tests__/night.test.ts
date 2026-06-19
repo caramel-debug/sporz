@@ -15,7 +15,6 @@ function makeState(overrides: Partial<GameState> & { players: Player[] }): GameS
     enabledRoles: [],
     phase: 'night',
     nightNumber: 1,
-    pendingNight: emptyActions(),
     hackerHistory: [],
     log: [],
     winner: null,

@@ -85,23 +85,26 @@ export function resolveNight(
     reports.push({ type: 'consigne', text: `Médecin (${m.name}) ${reason} — ne se réveille pas, mimer l'action.` })
   })
 
-  // Soins
-  if (actions.medecinKill) {
-    const target = getPlayer(actions.medecinKill)
-    if (target && target.alive) target.alive = false
-  } else {
-    for (const healId of actions.medecinHeals) {
-      const target = getPlayer(healId)
-      if (!target || !target.alive) continue
-      if (target.etat === 'mutant' && target.genome === 'hote') {
-        // Insoignable — apprend son génome
-        reports.push({ type: 'soin_echec_hote_mute', targetId: target.id, targetName: target.name })
-      } else if (target.etat === 'mutant') {
-        target.etat = 'sain'
-        indicators[healId].soigne = true
-      } else {
-        indicators[healId].soigne = true
-        // Sain soigné → rien de particulier (hôte sain soigné = toucher simple, pas de révélation)
+  // Soins — uniquement si au moins un médecin est éveillé
+  const awakeMedecins = medecins.filter(m => m.alive && m.etat !== 'mutant' && !indicators[m.id].paralyse)
+  if (awakeMedecins.length > 0) {
+    if (actions.medecinKill) {
+      const target = getPlayer(actions.medecinKill)
+      if (target && target.alive) target.alive = false
+    } else {
+      for (const healId of actions.medecinHeals) {
+        const target = getPlayer(healId)
+        if (!target || !target.alive) continue
+        if (target.etat === 'mutant' && target.genome === 'hote') {
+          // Insoignable — apprend son génome
+          reports.push({ type: 'soin_echec_hote_mute', targetId: target.id, targetName: target.name })
+        } else if (target.etat === 'mutant') {
+          target.etat = 'sain'
+          indicators[healId].soigne = true
+        } else {
+          indicators[healId].soigne = true
+          // Sain soigné → rien de particulier (hôte sain soigné = toucher simple, pas de révélation)
+        }
       }
     }
   }
@@ -130,12 +133,16 @@ export function resolveNight(
     } else {
       indicators[psy.id].aOuvertLesYeux = true
       const target = getPlayer(actions.psyTarget)
-      indicators[actions.psyTarget].inspectePsy = true
-      reports.push({
-        type: 'info', role: 'psychologue',
-        label: `État de ${target.name}`,
-        result: target.etat === 'mutant' ? 'MUTANT' : 'SAIN',
-      })
+      if (!target.alive) {
+        reports.push({ type: 'info', role: 'psychologue', label: `${target.name}`, result: 'MORT cette nuit — aucune information.' })
+      } else {
+        indicators[actions.psyTarget].inspectePsy = true
+        reports.push({
+          type: 'info', role: 'psychologue',
+          label: `État de ${target.name}`,
+          result: target.etat === 'mutant' ? 'MUTANT' : 'SAIN',
+        })
+      }
     }
   }
 
@@ -149,12 +156,16 @@ export function resolveNight(
     } else {
       indicators[gen.id].aOuvertLesYeux = true
       const target = getPlayer(actions.geneticienTarget)
-      indicators[actions.geneticienTarget].inspecteGeneticien = true
-      reports.push({
-        type: 'info', role: 'geneticien',
-        label: `Génome de ${target.name}`,
-        result: target.genome.toUpperCase(),
-      })
+      if (!target.alive) {
+        reports.push({ type: 'info', role: 'geneticien', label: `${target.name}`, result: 'MORT cette nuit — aucune information.' })
+      } else {
+        indicators[actions.geneticienTarget].inspecteGeneticien = true
+        reports.push({
+          type: 'info', role: 'geneticien',
+          label: `Génome de ${target.name}`,
+          result: target.genome.toUpperCase(),
+        })
+      }
     }
   }
 
@@ -167,22 +178,26 @@ export function resolveNight(
       reports.push({ type: 'skip', role: 'espion', reason: 'paralysé' })
     } else {
       indicators[esp.id].aOuvertLesYeux = true
-      const ind = indicators[actions.espionTarget]
       const target = getPlayer(actions.espionTarget)
-      const lines = [
-        `A ouvert les yeux : ${ind.aOuvertLesYeux ? 'OUI' : 'NON'}`,
-        `Muté cette nuit : ${ind.mute ? 'OUI' : 'NON'}`,
-        `Paralysé : ${ind.paralyse ? 'OUI' : 'NON'}`,
-        `Infecté : ${ind.infecte ? 'OUI' : 'NON'}`,
-        `Soigné : ${ind.soigne ? 'OUI' : 'NON'}`,
-        `Inspecté par le psy : ${ind.inspectePsy ? 'OUI' : 'NON'}`,
-        `Inspecté par le généticien : ${ind.inspecteGeneticien ? 'OUI' : 'NON'}`,
-      ]
-      reports.push({
-        type: 'info', role: 'espion',
-        label: `Rapport sur ${target.name}`,
-        result: lines.join('\n'),
-      })
+      if (!target.alive) {
+        reports.push({ type: 'info', role: 'espion', label: `${target.name}`, result: 'MORT cette nuit — aucune information.' })
+      } else {
+        const ind = indicators[actions.espionTarget]
+        const lines = [
+          `A ouvert les yeux : ${ind.aOuvertLesYeux ? 'OUI' : 'NON'}`,
+          `Muté cette nuit : ${ind.mute ? 'OUI' : 'NON'}`,
+          `Paralysé : ${ind.paralyse ? 'OUI' : 'NON'}`,
+          `Infecté : ${ind.infecte ? 'OUI' : 'NON'}`,
+          `Soigné : ${ind.soigne ? 'OUI' : 'NON'}`,
+          `Inspecté par le psy : ${ind.inspectePsy ? 'OUI' : 'NON'}`,
+          `Inspecté par le généticien : ${ind.inspecteGeneticien ? 'OUI' : 'NON'}`,
+        ]
+        reports.push({
+          type: 'info', role: 'espion',
+          label: `Rapport sur ${target.name}`,
+          result: lines.join('\n'),
+        })
+      }
     }
   }
 
