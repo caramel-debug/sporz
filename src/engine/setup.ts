@@ -46,7 +46,7 @@ export function assignRoles(names: string[], enabledRoles: Role[], mutantCount =
     ...Array(Math.max(0, otherIndices.length - 2)).fill('normal' as Genome),
   ])
 
-  const players: Player[] = allNames.map((name, i) => {
+  const assignedPlayers: Player[] = allNames.map((name, i) => {
     const role = orderedRoles[i] ?? 'astronaute'
     let genome: Genome
     let etat: Etat
@@ -73,6 +73,11 @@ export function assignRoles(names: string[], enabledRoles: Role[], mutantCount =
       isChef: false,
     }
   })
+
+  // L'ordre d'attribution (mutant, médecins, ...) est déterministe par position.
+  // On mélange le tableau final pour découpler l'ordre d'affichage du rôle,
+  // sinon le 1er joueur de la liste de distribution serait toujours le mutant.
+  const players = shuffle(assignedPlayers)
 
   const emptyNightIndicators: Record<string, NightIndicators> = {}
   players.forEach(p => {
