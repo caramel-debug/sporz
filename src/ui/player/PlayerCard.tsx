@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom'
 import type { PlayerToken } from '../../engine'
 import HudPanel from '../shared/HudPanel'
 
@@ -44,6 +45,12 @@ export default function PlayerCard({ token }: PlayerCardProps) {
 
         <div className="text-center text-xs text-hud-muted opacity-50">
           Ne partagez pas cet écran.
+        </div>
+
+        <div className="text-center">
+          <Link to="/?player=1" className="text-xs text-hud-muted hover:text-hud-green transition-colors underline underline-offset-2">
+            Récap des règles →
+          </Link>
         </div>
       </div>
     </div>

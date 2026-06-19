@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom'
+import { Link, useSearchParams } from 'react-router-dom'
 import HudPanel from '../shared/HudPanel'
 
 const ROLES = [
@@ -19,13 +19,18 @@ const GENOMES = [
 ]
 
 export default function ReferencePage() {
+  const [searchParams] = useSearchParams()
+  const isPlayer = searchParams.get('player') === '1'
+
   return (
     <div className="max-w-lg mx-auto p-4 space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="text-hud-green text-xl font-bold tracking-widest uppercase">⬡ Sporz — Référence</h1>
-        <Link to="/odb" className="text-xs text-hud-muted hover:text-hud-green transition-colors border border-hud-border px-2 py-1 rounded-sm">
-          Mode OdB →
-        </Link>
+        {!isPlayer && (
+          <Link to="/odb" className="text-xs text-hud-muted hover:text-hud-green transition-colors border border-hud-border px-2 py-1 rounded-sm">
+            Mode OdB →
+          </Link>
+        )}
       </div>
 
       <HudPanel title="Déroulé d'une partie">
