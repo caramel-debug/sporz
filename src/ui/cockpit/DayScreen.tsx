@@ -9,7 +9,7 @@ type DayPhase = 'chef' | 'discussion' | 'vote' | 'autopsie' | 'done'
 
 export default function DayScreen() {
   const { state, setState } = useGame()
-  const [selectedVote, setSelectedVote] = useState<string | 'blanc' | null>(null)
+  const [voteTally, setVoteTally] = useState<Record<string, number>>({})
   const [selectedChef, setSelectedChef] = useState<string | null>(null)
   const [autopsieReports, setAutopsieReports] = useState<DayReport[] | null>(null)
   const [dayPhase, setDayPhase] = useState<DayPhase>(() => {
@@ -34,9 +34,28 @@ export default function DayScreen() {
 
   const skipChef = () => setDayPhase('discussion')
 
-  const execute = () => {
-    if (!selectedVote) return
-    const targetId = selectedVote === 'blanc' ? null : selectedVote
+  const addVote = (id: string) => setVoteTally(prev => ({ ...prev, [id]: (prev[id] ?? 0) + 1 }))
+  const removeVote = (id: string) => setVoteTally(prev => {
+    const count = (prev[id] ?? 0) - 1
+    if (count <= 0) { const { [id]: _, ...rest } = prev; return rest }
+    return { ...prev, [id]: count }
+  })
+  const resetVotes = () => setVoteTally({})
+
+  const totalVotes = Object.values(voteTally).reduce((a, b) => a + b, 0)
+  const totalVoters = livePlayers.length
+
+  // Déterminer le vainqueur du vote
+  const voteEntries = Object.entries(voteTally).filter(([, count]) => count > 0)
+  const maxVotes = voteEntries.length > 0 ? Math.max(...voteEntries.map(([, c]) => c)) : 0
+  const topCandidates = voteEntries.filter(([, c]) => c === maxVotes).map(([id]) => id)
+  const blancVotes = voteTally['blanc'] ?? 0
+  const isBlancWinner = blancVotes > 0 && blancVotes >= maxVotes && !topCandidates.some(id => id !== 'blanc')
+  const isTie = topCandidates.length > 1 || (topCandidates.length === 1 && blancVotes === maxVotes && topCandidates[0] !== 'blanc')
+  const winnerId = !isTie && topCandidates.length === 1 ? topCandidates[0] : null
+  const winnerName = winnerId && winnerId !== 'blanc' ? livePlayers.find(p => p.id === winnerId)?.name : null
+
+  const executeVoteResult = (targetId: string | null) => {
     const { state: nextState, reports } = resolveExecution(state, targetId)
     const endResult = checkEnd(nextState)
     const finalState = endResult === 'sains' || endResult === 'mutants'
@@ -48,7 +67,6 @@ export default function DayScreen() {
       setState(finalState)
       setDayPhase('autopsie')
     } else {
-      // Vote blanc
       setState(finalState)
       setDayPhase('done')
     }
@@ -115,34 +133,93 @@ export default function DayScreen() {
       {dayPhase === 'vote' && (
         <>
           <HudPanel title="Vote — Qui exécuter ?">
-            <PlayerList
-              players={livePlayers}
-              onSelect={id => setSelectedVote(selectedVote === id ? null : id)}
-              selectedIds={selectedVote && selectedVote !== 'blanc' ? [selectedVote] : []}
-            />
-            <button
-              onClick={() => setSelectedVote(selectedVote === 'blanc' ? null : 'blanc')}
-              className={`mt-3 w-full py-2 text-sm border rounded-sm transition-colors
-                ${selectedVote === 'blanc' ? 'border-hud-blue bg-hud-blue/10 text-hud-blue' : 'border-hud-border text-hud-muted hover:border-hud-muted'}`}
-            >
-              ○ Vote blanc (personne n'est exécuté)
-            </button>
+            <div className="space-y-2">
+              {livePlayers.map(p => {
+                const count = voteTally[p.id] ?? 0
+                const isTop = count > 0 && count === maxVotes
+                return (
+                  <div key={p.id} className={`flex items-center justify-between gap-2 p-2 border rounded-sm transition-colors ${isTop ? 'border-hud-red bg-hud-red/5' : 'border-hud-border'}`}>
+                    <div className="flex items-center gap-2 min-w-0">
+                      <span className={`text-sm truncate ${isTop ? 'text-hud-red font-bold' : 'text-hud-green'}`}>{p.name}</span>
+                      {p.isChef && <span className="text-xs text-hud-amber" title="Capitaine — vote double">★×2</span>}
+                    </div>
+                    <div className="flex items-center gap-1">
+                      <button
+                        onClick={() => removeVote(p.id)}
+                        disabled={count === 0}
+                        className="w-7 h-7 border border-hud-border text-hud-muted hover:border-hud-red hover:text-hud-red disabled:opacity-20 disabled:cursor-not-allowed rounded-sm transition-colors text-sm"
+                      >−</button>
+                      <span className={`w-8 text-center font-mono text-sm font-bold ${count > 0 ? 'text-hud-red' : 'text-hud-muted'}`}>{count}</span>
+                      <button
+                        onClick={() => addVote(p.id)}
+                        className="w-7 h-7 border border-hud-border text-hud-muted hover:border-hud-green hover:text-hud-green rounded-sm transition-colors text-sm"
+                      >+</button>
+                    </div>
+                  </div>
+                )
+              })}
+
+              {/* Vote blanc */}
+              <div className={`flex items-center justify-between gap-2 p-2 border rounded-sm transition-colors ${isBlancWinner ? 'border-hud-blue bg-hud-blue/5' : 'border-hud-border'}`}>
+                <span className={`text-sm ${isBlancWinner ? 'text-hud-blue font-bold' : 'text-hud-muted'}`}>○ Vote blanc</span>
+                <div className="flex items-center gap-1">
+                  <button
+                    onClick={() => removeVote('blanc')}
+                    disabled={blancVotes === 0}
+                    className="w-7 h-7 border border-hud-border text-hud-muted hover:border-hud-red hover:text-hud-red disabled:opacity-20 disabled:cursor-not-allowed rounded-sm transition-colors text-sm"
+                  >−</button>
+                  <span className={`w-8 text-center font-mono text-sm font-bold ${blancVotes > 0 ? 'text-hud-blue' : 'text-hud-muted'}`}>{blancVotes}</span>
+                  <button
+                    onClick={() => addVote('blanc')}
+                    className="w-7 h-7 border border-hud-border text-hud-muted hover:border-hud-green hover:text-hud-green rounded-sm transition-colors text-sm"
+                  >+</button>
+                </div>
+              </div>
+            </div>
+
+            {/* Compteur et résultat */}
+            <div className="mt-3 pt-3 border-t border-hud-border space-y-2">
+              <div className="flex items-center justify-between text-xs">
+                <span className="text-hud-muted">{totalVotes} / {totalVoters} votes déposés</span>
+                <button onClick={resetVotes} className="text-hud-muted hover:text-hud-red transition-colors">↺ Reset</button>
+              </div>
+              {totalVotes > 0 && (
+                <div className={`text-sm p-2 border rounded-sm text-center ${isTie ? 'border-hud-amber text-hud-amber' : isBlancWinner ? 'border-hud-blue text-hud-blue' : 'border-hud-red text-hud-red'}`}>
+                  {isTie
+                    ? '⚠ Égalité — le capitaine tranche'
+                    : isBlancWinner
+                      ? '○ Vote blanc en tête — personne n\'est exécuté'
+                      : winnerName
+                        ? `${winnerName} en tête (${maxVotes} voix)`
+                        : null}
+                </div>
+              )}
+            </div>
           </HudPanel>
 
           <div className="flex gap-2">
             <button
-              onClick={() => setDayPhase('discussion')}
+              onClick={() => { setDayPhase('discussion'); resetVotes() }}
               className="flex-1 py-2 border border-hud-muted text-hud-muted hover:border-hud-green hover:text-hud-green transition-colors rounded-sm text-sm"
             >
               ← Retour
             </button>
-            <button
-              onClick={execute}
-              disabled={!selectedVote}
-              className="flex-1 py-3 border border-hud-red text-hud-red font-bold tracking-widest uppercase hover:bg-hud-red hover:text-hud-bg transition-colors disabled:opacity-30 disabled:cursor-not-allowed rounded-sm"
-            >
-              ▶ Exécuter
-            </button>
+            {isBlancWinner && !isTie && (
+              <button
+                onClick={() => executeVoteResult(null)}
+                className="flex-1 py-3 border border-hud-blue text-hud-blue font-bold tracking-widest uppercase hover:bg-hud-blue hover:text-hud-bg transition-colors rounded-sm"
+              >
+                ○ Vote blanc
+              </button>
+            )}
+            {winnerId && winnerId !== 'blanc' && !isTie && (
+              <button
+                onClick={() => executeVoteResult(winnerId)}
+                className="flex-1 py-3 border border-hud-red text-hud-red font-bold tracking-widest uppercase hover:bg-hud-red hover:text-hud-bg transition-colors rounded-sm"
+              >
+                ▶ Exécuter {winnerName}
+              </button>
+            )}
           </div>
         </>
       )}
