@@ -1,0 +1,37 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(bash:*)",
+      "Bash(mkdir -p /c/Users/malih/.claude/projects/C--Users-malih-Projects-sporz/memory)",
+      "Bash(mkdir -p /c/Users/malih/Projects/sporz/docs/superpowers/plans)",
+      "Bash(npm create:*)",
+      "Bash(printf \"3\\\\n\")",
+      "Bash(npx create-vite@latest:*)",
+      "Bash(cp /tmp/sporz-temp/package.json /c/Users/malih/Projects/sporz/)",
+      "Bash(cp /tmp/sporz-temp/tsconfig.json /c/Users/malih/Projects/sporz/)",
+      "Bash(cp /tmp/sporz-temp/tsconfig.app.json /c/Users/malih/Projects/sporz/)",
+      "Bash(cp /tmp/sporz-temp/tsconfig.node.json /c/Users/malih/Projects/sporz/)",
+      "Bash(cp /tmp/sporz-temp/vite.config.ts /c/Users/malih/Projects/sporz/)",
+      "Bash(npm install:*)",
+      "Bash(npx tsc:*)",
+      "Bash(git init:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git config:*)",
+      "Bash(npm run:*)",
+      "Bash(npm list:*)",
+      "mcp__plugin_context7_context7__resolve-library-id",
+      "mcp__plugin_context7_context7__query-docs",
+      "Bash(npm outdated:*)",
+      "Bash(git rm:*)",
+      "Bash(npx vitest:*)",
+      "Bash(node:*)",
+      "Bash(python -c \"import json,sys; p=json.load\\(sys.stdin\\); print\\(p.get\\('name','?'\\), p.get\\('scripts',{}\\).get\\('build','?'\\)\\)\")",
+      "Bash(gh repo:*)",
+      "Bash(command -v gh)",
+      "Bash(gh auth:*)",
+      "Bash(gh api:*)",
+      "Bash(git push:*)"
+    ]
+  }
+}

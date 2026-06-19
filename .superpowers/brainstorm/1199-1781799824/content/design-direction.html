@@ -1,0 +1,59 @@
+<h2>Direction visuelle — Sporz Companion</h2>
+<p class="subtitle">L'app est un outil de jeu spatial à rôles cachés. Quelle ambiance choisir ?</p>
+
+<div class="cards">
+  <div class="card" data-choice="space-dark" onclick="toggleSelect(this)">
+    <div class="card-image" style="background: linear-gradient(135deg, #0a0a1a 0%, #1a1a3e 50%, #0d2b45 100%); padding: 20px; min-height: 140px; display: flex; flex-direction: column; gap: 8px;">
+      <div style="font-family: monospace; color: #00e5ff; font-size: 11px; letter-spacing: 2px;">ORDINATEUR DE BORD — NUIT 3</div>
+      <div style="background: rgba(0,229,255,0.1); border: 1px solid #00e5ff44; border-radius: 6px; padding: 10px; color: #e0f7fa; font-size: 13px;">
+        <div style="color: #00e5ff; font-size: 11px; margin-bottom: 4px;">MUTANTS</div>
+        Sélectionnez la cible à muter
+      </div>
+      <div style="display: flex; gap: 6px; flex-wrap: wrap;">
+        <span style="background: #00e5ff22; border: 1px solid #00e5ff55; color: #80deea; border-radius: 4px; padding: 2px 8px; font-size: 11px;">Alice</span>
+        <span style="background: #00e5ff22; border: 1px solid #00e5ff55; color: #80deea; border-radius: 4px; padding: 2px 8px; font-size: 11px;">Bob</span>
+        <span style="background: #ff173322; border: 1px solid #ff173355; color: #ff8a80; border-radius: 4px; padding: 2px 8px; font-size: 11px; text-decoration: line-through;">Carol ✕</span>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>🌌 Cockpit Spatial</h3>
+      <p>Fond sombre, police monospace, accents cyan/bleu. Atmosphère de vaisseau spatial. Immersif, colle à l'univers du jeu.</p>
+    </div>
+  </div>
+
+  <div class="card" data-choice="clean-minimal" onclick="toggleSelect(this)">
+    <div class="card-image" style="background: #f8fafc; padding: 20px; min-height: 140px; display: flex; flex-direction: column; gap: 8px; border-bottom: 1px solid #e2e8f0;">
+      <div style="font-family: system-ui; color: #475569; font-size: 11px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase;">Nuit 3 · Mutants</div>
+      <div style="background: white; border: 1px solid #e2e8f0; border-radius: 8px; padding: 10px; color: #1e293b; font-size: 13px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+        Sélectionnez la cible à muter
+      </div>
+      <div style="display: flex; gap: 6px; flex-wrap: wrap;">
+        <span style="background: #f1f5f9; border: 1px solid #cbd5e1; color: #334155; border-radius: 6px; padding: 2px 10px; font-size: 12px;">Alice</span>
+        <span style="background: #f1f5f9; border: 1px solid #cbd5e1; color: #334155; border-radius: 6px; padding: 2px 10px; font-size: 12px;">Bob</span>
+        <span style="background: #fef2f2; border: 1px solid #fecaca; color: #991b1b; border-radius: 6px; padding: 2px 10px; font-size: 12px; text-decoration: line-through;">Carol</span>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>☁️ Interface Propre</h3>
+      <p>Fond clair, typographie nette, couleurs sobres. Lisible sous toutes conditions, facile à utiliser rapidement. Pragmatique.</p>
+    </div>
+  </div>
+
+  <div class="card" data-choice="dark-warm" onclick="toggleSelect(this)">
+    <div class="card-image" style="background: linear-gradient(135deg, #1c1917 0%, #292524 50%, #1c1917 100%); padding: 20px; min-height: 140px; display: flex; flex-direction: column; gap: 8px;">
+      <div style="font-family: system-ui; color: #f59e0b; font-size: 11px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase;">Nuit 3 · Mutants</div>
+      <div style="background: rgba(245,158,11,0.08); border: 1px solid #f59e0b44; border-radius: 8px; padding: 10px; color: #fef3c7; font-size: 13px;">
+        Sélectionnez la cible à muter
+      </div>
+      <div style="display: flex; gap: 6px; flex-wrap: wrap;">
+        <span style="background: #f59e0b22; border: 1px solid #f59e0b55; color: #fcd34d; border-radius: 6px; padding: 2px 8px; font-size: 11px;">Alice</span>
+        <span style="background: #f59e0b22; border: 1px solid #f59e0b55; color: #fcd34d; border-radius: 6px; padding: 2px 8px; font-size: 11px;">Bob</span>
+        <span style="background: #ef444422; border: 1px solid #ef444455; color: #fca5a5; border-radius: 6px; padding: 2px 8px; font-size: 11px; text-decoration: line-through;">Carol ✕</span>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>🔥 Dark Chaleureux</h3>
+      <p>Fond sombre, accents ambre/orange. Moins froid que le bleu spatial, plus lisible la nuit. Entre les deux mondes.</p>
+    </div>
+  </div>
+</div>
