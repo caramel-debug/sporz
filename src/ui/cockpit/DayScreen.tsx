@@ -43,7 +43,9 @@ export default function DayScreen() {
   const resetVotes = () => setVoteTally({})
 
   const totalVotes = Object.values(voteTally).reduce((a, b) => a + b, 0)
-  const totalVoters = livePlayers.length
+  const chef = livePlayers.find(p => p.isChef)
+  const maxTotalVotes = livePlayers.length + (chef ? 1 : 0)
+  const votesRemaining = maxTotalVotes - totalVotes
 
   // Déterminer le vainqueur du vote
   const voteEntries = Object.entries(voteTally).filter(([, count]) => count > 0)
@@ -152,7 +154,8 @@ export default function DayScreen() {
                       <span className={`w-8 text-center font-mono text-sm font-bold ${count > 0 ? 'text-hud-red' : 'text-hud-muted'}`}>{count}</span>
                       <button
                         onClick={() => addVote(p.id)}
-                        className="w-7 h-7 border border-hud-border text-hud-muted hover:border-hud-green hover:text-hud-green rounded-sm transition-colors text-sm"
+                        disabled={votesRemaining <= 0}
+                        className="w-7 h-7 border border-hud-border text-hud-muted hover:border-hud-green hover:text-hud-green disabled:opacity-20 disabled:cursor-not-allowed rounded-sm transition-colors text-sm"
                       >+</button>
                     </div>
                   </div>
@@ -171,7 +174,8 @@ export default function DayScreen() {
                   <span className={`w-8 text-center font-mono text-sm font-bold ${blancVotes > 0 ? 'text-hud-blue' : 'text-hud-muted'}`}>{blancVotes}</span>
                   <button
                     onClick={() => addVote('blanc')}
-                    className="w-7 h-7 border border-hud-border text-hud-muted hover:border-hud-green hover:text-hud-green rounded-sm transition-colors text-sm"
+                    disabled={votesRemaining <= 0}
+                    className="w-7 h-7 border border-hud-border text-hud-muted hover:border-hud-green hover:text-hud-green disabled:opacity-20 disabled:cursor-not-allowed rounded-sm transition-colors text-sm"
                   >+</button>
                 </div>
               </div>
@@ -180,7 +184,7 @@ export default function DayScreen() {
             {/* Compteur et résultat */}
             <div className="mt-3 pt-3 border-t border-hud-border space-y-2">
               <div className="flex items-center justify-between text-xs">
-                <span className="text-hud-muted">{totalVotes} / {totalVoters} votes déposés</span>
+                <span className="text-hud-muted">{totalVotes} / {maxTotalVotes} votes{chef ? ' (★ cap. ×2)' : ''}</span>
                 <button onClick={resetVotes} className="text-hud-muted hover:text-hud-red transition-colors">↺ Reset</button>
               </div>
               {totalVotes > 0 && (
