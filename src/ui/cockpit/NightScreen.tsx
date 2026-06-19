@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useRef, useCallback } from 'react'
 import { useGame } from '../../store/gameStore'
 import { resolveNight, checkEnd } from '../../engine'
 import type { NightActions, Role, NightReport, GameState } from '../../engine'
@@ -39,6 +39,20 @@ export default function NightScreen() {
     medecinHeals: [], medecinKill: null,
     psyTarget: null, geneticienTarget: null, espionTarget: null, hackerRole: null,
   })
+  const undoStack = useRef<NightActions[]>([])
+
+  const setActionsWithUndo = useCallback((updater: NightActions | ((prev: NightActions) => NightActions)) => {
+    setActions(prev => {
+      undoStack.current.push(prev)
+      return typeof updater === 'function' ? updater(prev) : updater
+    })
+  }, [])
+
+  const undo = useCallback(() => {
+    const prev = undoStack.current.pop()
+    if (prev) setActions(prev)
+  }, [])
+
   const [stepIdx, setStepIdx] = useState(0)
   const [finalReports, setFinalReports] = useState<NightReport[] | null>(null)
   const [pendingState, setPendingState] = useState<GameState | null>(null)
@@ -164,7 +178,7 @@ export default function NightScreen() {
 
       <HudPanel title={STEP_LABELS[currentStep]}>
         <p className="text-hud-amber text-sm italic mb-4">{NARRATION[currentStep]}</p>
-        <StepContent step={currentStep} actions={actions} setActions={setActions} players={livingPlayers} state={state} />
+        <StepContent step={currentStep} actions={actions} setActions={setActionsWithUndo} players={livingPlayers} state={state} />
       </HudPanel>
 
       <HudPanel title="Tableau de bord OdB">
@@ -175,6 +189,11 @@ export default function NightScreen() {
         {stepIdx > 0 && (
           <button onClick={prevStep} className="flex-1 py-2 border border-hud-muted text-hud-muted hover:border-hud-green hover:text-hud-green transition-colors rounded-sm text-sm">
             ← Retour
+          </button>
+        )}
+        {undoStack.current.length > 0 && (
+          <button onClick={undo} className="py-2 px-3 border border-hud-amber text-hud-amber hover:bg-hud-amber hover:text-hud-bg transition-colors rounded-sm text-sm">
+            ↺ Annuler
           </button>
         )}
         <button

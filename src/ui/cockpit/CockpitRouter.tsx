@@ -4,6 +4,7 @@ import DistributionScreen from './DistributionScreen'
 import NightScreen from './NightScreen'
 import DayScreen from './DayScreen'
 import EndScreen from './EndScreen'
+import StatusBar from './StatusBar'
 
 export default function CockpitRouter() {
   const { state, reset } = useGame()
@@ -17,7 +18,8 @@ export default function CockpitRouter() {
 
   return (
     <div>
-      <div className="max-w-lg mx-auto px-4 pt-3 flex justify-end">
+      <StatusBar />
+      <div className="max-w-lg mx-auto px-4 pt-2 flex justify-end">
         <button
           onClick={handleAbandon}
           className="text-xs text-hud-muted hover:text-hud-red transition-colors border border-hud-border hover:border-hud-red px-2 py-1 rounded-sm"

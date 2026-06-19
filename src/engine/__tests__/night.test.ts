@@ -18,6 +18,7 @@ function makeState(overrides: Partial<GameState> & { players: Player[] }): GameS
     nightNumber: 1,
     hackerHistory: [],
     log: [],
+    nightHistory: [],
     winner: null,
     nightIndicators: indicators,
     ...overrides,

@@ -1,5 +1,5 @@
 import type {
-  GameState, NightActions, NightReport, Player, Role, NightIndicators
+  GameState, NightActions, NightReport, NightSummaryEvent, Player, Role, NightIndicators
 } from './types'
 
 // ─── Helpers publics (exportés pour les tests CAS 8 & 10) ────────────────────
@@ -248,6 +248,22 @@ export function resolveNight(
     description: `Nuit ${state.nightNumber} résolue — ${reports.length} événements.`,
   }
 
+  // ── Historique de nuit (diff avant/après) ─────────────────────────────────
+  const summaryEvents: NightSummaryEvent[] = []
+  for (const after of players) {
+    const before = state.players.find(p => p.id === after.id)!
+    if (before.alive && !after.alive)
+      summaryEvents.push({ icon: '✕', text: `${after.name} est mort·e.`, color: 'text-hud-red' })
+    else if (before.etat === 'sain' && after.etat === 'mutant')
+      summaryEvents.push({ icon: '⚠', text: `${after.name} a été muté·e.`, color: 'text-hud-amber' })
+    else if (before.etat === 'mutant' && after.etat === 'sain')
+      summaryEvents.push({ icon: '✓', text: `${after.name} a été soigné·e.`, color: 'text-hud-green' })
+  }
+  if (summaryEvents.length === 0)
+    summaryEvents.push({ icon: '—', text: 'Aucun événement notable.', color: 'text-hud-muted' })
+
+  const nightSummary = { nightNumber: state.nightNumber, events: summaryEvents }
+
   return {
     state: {
       ...state,
@@ -255,6 +271,7 @@ export function resolveNight(
       nightIndicators: indicators,
       hackerHistory,
       log: [...state.log, logEntry],
+      nightHistory: [...state.nightHistory, nightSummary],
       phase: 'day',
     },
     reports,

@@ -14,7 +14,7 @@ function makeState(players: Player[]): GameState {
   })
   return {
     gid: 'TEST', players, enabledRoles: [], phase: 'day', nightNumber: 1,
-    hackerHistory: [], log: [], winner: null, nightIndicators: indicators,
+    hackerHistory: [], log: [], nightHistory: [], winner: null, nightIndicators: indicators,
   }
 }
 

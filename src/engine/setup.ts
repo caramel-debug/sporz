@@ -95,6 +95,7 @@ export function assignRoles(names: string[], enabledRoles: Role[], mutantCount =
     nightNumber: 0,
     hackerHistory: [],
     log: [],
+    nightHistory: [],
     winner: null,
     nightIndicators: emptyNightIndicators,
   }

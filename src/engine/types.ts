@@ -59,6 +59,17 @@ export interface GameEvent {
   description: string
 }
 
+export interface NightSummaryEvent {
+  icon: string
+  text: string
+  color: string
+}
+
+export interface NightSummary {
+  nightNumber: number
+  events: NightSummaryEvent[]
+}
+
 export interface GameState {
   gid: string
   players: Player[]
@@ -67,6 +78,7 @@ export interface GameState {
   nightNumber: number
   hackerHistory: Role[]
   log: GameEvent[]
+  nightHistory: NightSummary[]
   winner: 'sains' | 'mutants' | null
   nightIndicators: Record<string, NightIndicators>
 }
