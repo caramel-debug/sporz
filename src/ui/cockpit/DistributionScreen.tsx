@@ -42,6 +42,7 @@ export default function DistributionScreen() {
       r: revealed.role,
       e: revealed.etat,
       g: state.gid,
+      t: Date.now(),
       ...(revealed.role === 'mutant_base' ? { h: true as true } : {}),
     }
     return (
@@ -66,6 +67,7 @@ export default function DistributionScreen() {
       r: revealed.role,
       e: revealed.etat,
       g: state.gid,
+      t: Date.now(),
       ...(revealed.role === 'mutant_base' ? { h: true } : {}),
     })
     const url = `${window.location.origin}/#${token}`
@@ -119,7 +121,7 @@ export default function DistributionScreen() {
         <ul className="space-y-2">
           {state.players.map(p => {
             const done = doneIds.has(p.id)
-            const token = encodeToken({ n: p.name, r: p.role, e: p.etat, g: state.gid, ...(p.role === 'mutant_base' ? { h: true } : {}) })
+            const token = encodeToken({ n: p.name, r: p.role, e: p.etat, g: state.gid, t: Date.now(), ...(p.role === 'mutant_base' ? { h: true } : {}) })
             return (
               <li key={p.id} className="flex items-center justify-between gap-2">
                 <span className={done ? 'text-hud-muted line-through' : 'text-hud-green'}>

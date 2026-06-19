@@ -4,6 +4,7 @@ export interface PlayerToken {
   e: string   // etat
   h?: true    // hote (mutant_base seulement)
   g?: string  // gid (identifiant de partie)
+  t?: number  // timestamp de création (ms)
 }
 
 export function encodeToken(token: PlayerToken): string {

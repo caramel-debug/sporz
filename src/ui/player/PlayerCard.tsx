@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import type { PlayerToken } from '../../engine'
 import HudPanel from '../shared/HudPanel'
@@ -13,6 +14,16 @@ const ROLE_DESCRIPTIONS: Record<string, { label: string; action: string; color: 
   astronaute:    { label: 'Astronaute',       action: 'Pas d\'action nocturne. Participez aux discussions de jour, votez avec sagesse.', color: 'text-hud-muted' },
 }
 
+const EXPIRY_MS = 2 * 60 * 60 * 1000 // 2 heures
+
+function formatAge(ms: number): string {
+  const minutes = Math.floor(ms / 60_000)
+  if (minutes < 60) return `${minutes} min`
+  const hours = Math.floor(minutes / 60)
+  const remainingMin = minutes % 60
+  return remainingMin > 0 ? `${hours}h${String(remainingMin).padStart(2, '0')}` : `${hours}h`
+}
+
 interface PlayerCardProps {
   token: PlayerToken
 }
@@ -21,9 +32,26 @@ export default function PlayerCard({ token }: PlayerCardProps) {
   const info = ROLE_DESCRIPTIONS[token.r] ?? ROLE_DESCRIPTIONS['astronaute']
   const isMutant = token.e === 'mutant'
 
+  // Re-render toutes les 60s pour mettre à jour l'âge de la carte
+  const [now, setNow] = useState(Date.now())
+  useEffect(() => {
+    const id = setInterval(() => setNow(Date.now()), 60_000)
+    return () => clearInterval(id)
+  }, [])
+
+  const age = token.t ? now - token.t : null
+  const isExpired = age !== null && age > EXPIRY_MS
+
   return (
     <div className={`min-h-screen flex flex-col items-center justify-center p-6 ${isMutant ? 'bg-hud-red/5' : 'bg-hud-bg'}`}>
       <div className="w-full max-w-sm space-y-4">
+        {isExpired && (
+          <div className="text-center text-sm text-hud-red border-2 border-hud-red rounded-sm py-3 px-4 animate-pulse">
+            ⚠ Cette carte a été générée il y a {formatAge(age)}.<br />
+            Si une nouvelle partie a commencé, rescannez votre QR code.
+          </div>
+        )}
+
         <div className={`text-center py-4 border-2 rounded-sm ${isMutant ? 'border-hud-red' : 'border-hud-green'}`}>
           <div className="text-xs text-hud-muted uppercase tracking-widest mb-1">Identité de mission</div>
           <div className="text-2xl font-bold text-hud-green">{token.n}</div>
