@@ -57,4 +57,18 @@ describe('assignRoles', () => {
     const state = assignRoles(['A','B','C','D','E','F','G','H'], [])
     expect(state.phase).toBe('distribution')
   })
+
+  it("l'ordre d'affichage ne révèle pas les rôles (mutant pas toujours en tête)", () => {
+    // Régression : l'ordre d'attribution est déterministe par position
+    // (mutant, médecins, ...). Si le tableau final n'était pas mélangé, le
+    // 1er joueur de la liste de distribution serait toujours le mutant.
+    const names = ['A','B','C','D','E','F','G','H']
+    const mutantPositions = new Set<number>()
+    for (let run = 0; run < 50; run++) {
+      const state = assignRoles(names, ['informaticien'])
+      mutantPositions.add(state.players.findIndex(p => p.role === 'mutant_base'))
+    }
+    // Sur 50 tirages, la position du mutant doit varier — sinon l'ordre fuit le rôle.
+    expect(mutantPositions.size).toBeGreaterThan(1)
+  })
 })
