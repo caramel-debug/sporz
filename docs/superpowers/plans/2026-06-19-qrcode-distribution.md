@@ -1,3 +1,57 @@
+# QR Code Distribution Implementation Plan
+
+> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
+
+**Goal:** Ajouter un mode "QR code" dans DistributionScreen permettant à l'OdB d'afficher un QR code par joueur que celui-ci scanne pour voir son rôle sur son propre téléphone.
+
+**Architecture:** Le token system et le routing hash existent déjà (`encodeToken` → `App.tsx` lit `#<token>` → `PlayerCard`). Il suffit d'ajouter un 3e mode `'qr'` dans DistributionScreen qui affiche un `<QRCodeSVG>` encodant l'URL `${origin}/#${token}`. Un écran plein-écran par joueur : l'OdB voit le nom, le joueur scanne, l'OdB appuie sur "Scanné" pour passer au suivant.
+
+**Tech Stack:** `qrcode.react` v4 (React SVG QR codes, zéro dépendance)
+
+---
+
+### Task 1 : Installer qrcode.react
+
+**Files:**
+- Modify: `package.json` (via npm install)
+
+- [ ] **Step 1 : Installer le package**
+
+```bash
+npm install qrcode.react
+```
+
+Expected output : `added 1 package` (ou similaire), pas d'erreur.
+
+- [ ] **Step 2 : Vérifier l'import fonctionne**
+
+```bash
+node -e "require('./node_modules/qrcode.react/lib/index.js'); console.log('ok')"
+```
+
+Expected: `ok`
+
+- [ ] **Step 3 : Commit**
+
+```bash
+git add package.json package-lock.json
+git commit -m "chore: add qrcode.react dependency"
+```
+
+---
+
+### Task 2 : Ajouter le mode QR dans DistributionScreen
+
+**Files:**
+- Modify: `src/ui/cockpit/DistributionScreen.tsx`
+
+**Contexte :** Le composant a déjà un state `passMode` avec `'pass' | 'link'`. On ajoute `'qr'`. En mode `qr`, cliquer sur un joueur affiche un écran plein-écran avec son nom + un QR code + un bouton "Scanné". L'URL encodée dans le QR est `${window.location.origin}/#${token}` — exactement ce que le mode `link` copie déjà.
+
+- [ ] **Step 1 : Modifier DistributionScreen.tsx**
+
+Remplacer le contenu complet du fichier par :
+
+```tsx
 import { useState } from 'react'
 import { QRCodeSVG } from 'qrcode.react'
 import { useGame } from '../../store/gameStore'
@@ -77,7 +131,7 @@ export default function DistributionScreen() {
           <QRCodeSVG value={url} size={240} />
         </div>
         <div className="text-xs text-hud-muted text-center max-w-xs">
-          Montrez ce QR code au joueur.<br />Il scanne avec son téléphone pour voir son rôle.
+          Montrez ce QR code au joueur.<br />Il scanне avec son téléphone pour voir son rôle.
         </div>
         <button
           onClick={hidePlayer}
@@ -150,3 +204,39 @@ export default function DistributionScreen() {
     </div>
   )
 }
+```
+
+- [ ] **Step 2 : Vérifier que le build TypeScript passe**
+
+```bash
+npx tsc --noEmit
+```
+
+Expected: aucune erreur.
+
+- [ ] **Step 3 : Vérifier visuellement dans le navigateur**
+
+```bash
+npm run dev
+```
+
+Aller sur `http://localhost:5173/odb`, créer une partie, aller à l'écran Distribution, cliquer sur "QR Code" dans le toggle, puis "Afficher QR" pour un joueur. Vérifier que le QR s'affiche, le scanner avec un téléphone et vérifier que la PlayerCard s'ouvre.
+
+- [ ] **Step 4 : Commit**
+
+```bash
+git add src/ui/cockpit/DistributionScreen.tsx
+git commit -m "feat(distribution): ajouter mode QR code pour distribution des rôles"
+```
+
+---
+
+### Task 3 : Push et déploiement
+
+- [ ] **Step 1 : Push**
+
+```bash
+git push
+```
+
+Vercel déploie automatiquement depuis GitHub. Vérifier le déploiement sur le dashboard Vercel.
